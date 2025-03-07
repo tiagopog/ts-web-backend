@@ -14,7 +14,7 @@
     "db:migrate": "npx prisma migrate dev",
     "test": "test"
   },
-  "author": "Tiago Guedes, Ricardo Madeira",
+  "author": "Tiago Guedes",
   "license": "ISC",
   "devDependencies": {
     "@eslint/js": "^9.18.0",
