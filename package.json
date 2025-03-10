@@ -12,7 +12,8 @@
     "server": "npx ts-node src/web/index.ts",
     "db:seed": "npx ts-node local/seeds.ts",
     "db:migrate": "npx prisma migrate dev",
-    "test": "test"
+    "docker:test": "cd local && docker-compose run --rm backend npm test -- && cd ..",
+    "test": "jest"
   },
   "author": "Tiago Guedes",
   "license": "ISC",
