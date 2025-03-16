@@ -99,7 +99,7 @@ npm run docker:test src/tests/web/controllers/your_test_file.test.ts
 Alternatively, if you're not using Docker for local development, you can run:
 
 ```sh
-npx jest src/tests/web/controllers/your_test_file.test.ts
+npm test src/tests/web/controllers/your_test_file.test.ts
 ```
 
 ## Creating New Migrations
