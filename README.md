@@ -85,6 +85,23 @@ Or directly run it from your local shell:
 npm run docker:server
 ```
 
+## Tests
+
+This project uses the `jest` framework for test suites.
+
+After creating your test file and ending its name with `.test.ts`,
+you can run it with a Docker container by simply calling:
+
+```sh
+npm run docker:test src/tests/web/controllers/your_test_file.test.ts
+```
+
+Alternatively, if you're not using Docker for local development, you can run:
+
+```sh
+npx jest src/tests/web/controllers/your_test_file.test.ts
+```
+
 ## Creating New Migrations
 
 Access the container for the backend applications:
