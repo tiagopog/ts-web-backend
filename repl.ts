@@ -38,14 +38,14 @@ function listTsFiles(dirPath: string): string[] {
   const files = fs.readdirSync(dirPath)
 
   files.forEach((file) => {
-   const filePath = path.join(dirPath, file)
-   const fileStatus = fs.statSync(filePath)
+    const filePath = path.join(dirPath, file)
+    const fileStatus = fs.statSync(filePath)
 
-   if (fileStatus.isDirectory()) {
-     tsFiles = tsFiles.concat(listTsFiles(filePath))
-   } else if (file.endsWith('.js') || file.endsWith('.ts')) {
-     tsFiles.push(filePath)
-   }
+    if (fileStatus.isDirectory() && !file.match(/test/i)) {
+      tsFiles = tsFiles.concat(listTsFiles(filePath))
+    } else if (file.endsWith('.js') || file.endsWith('.ts')) {
+      tsFiles.push(filePath)
+    }
   })
 
   return tsFiles
@@ -55,7 +55,8 @@ function listTsFiles(dirPath: string): string[] {
  * Main
  */
 
-const srcDir = path.resolve(__dirname, './src')
+// Prepare env
+process.env.START_SERVER = 'false'
 
 // Start REPL server
 let server = repl.start({
@@ -66,10 +67,11 @@ let server = repl.start({
 console.log('TypeScript interactive shell')
 
 // Initial load of the source files
+const srcDir = path.resolve(__dirname, './src')
 loadModule(server, listTsFiles(srcDir))
 
 // Set up file to preserve the REPL history
-server.setupHistory('.node_repl_history', error => error && console.log(error))
+server.setupHistory('.node_repl_history', (error) => error && console.log(error))
 
 // Start prompting commands
 server.displayPrompt()
@@ -80,21 +82,23 @@ server.defineCommand('reload', {
   action() {
     server = loadModule(server, listTsFiles(srcDir))
     server.displayPrompt()
-  }
+  },
 })
 
 server.defineCommand('exit', {
   help: 'Reload the entire app with the latest code',
-  action() { process.exit() }
+  action() {
+    process.exit()
+  },
 })
 
 /*
  * Hot-code reloading
  */
 
- fs.watch(srcDir, {recursive: true}, (event: string, fileName: string | null) => {
-   if (fileName && fileName.endsWith('.ts')) {
-     loadModule(server, path.join(srcDir, fileName))
-   }
-   server.displayPrompt()
- })
+fs.watch(srcDir, { recursive: true }, (event: string, fileName: string | null) => {
+  if (fileName && fileName.endsWith('.ts')) {
+    loadModule(server, path.join(srcDir, fileName))
+  }
+  server.displayPrompt()
+})
