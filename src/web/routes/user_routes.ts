@@ -12,3 +12,4 @@ export class UserRoutes {
 }
 
 UserRoutes.router.get(UserRoutes.showUser, UserController.show as Application)
+UserRoutes.router.post(UserRoutes.createUser, UserController.create as Application)

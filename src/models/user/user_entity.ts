@@ -1,3 +1,15 @@
-import { User } from '@prisma/client'
+import { IsEmail, IsNotEmpty, IsString, validate } from 'class-validator'
 
-export type UserEntity = User
+export class UserEntity {
+  @IsString()
+  @IsNotEmpty()
+  name: string
+
+  @IsEmail()
+  @IsNotEmpty()
+  email: string
+
+  async validate() {
+    return validate(this)
+  }
+}
