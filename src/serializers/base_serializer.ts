@@ -1,23 +1,33 @@
+import { plainToInstance } from 'class-transformer'
 import { ClassConstructor } from '../../common/types'
 import { Deserializer, Serializer } from 'ts-jsonapi'
+import { validateSync } from 'class-validator'
+import { parseContractErrors } from '../errors'
 
 export class BaseSerializer {
   static readonly id: string
   static readonly type: string
-  static readonly attributes: Array<string>
+  static readonly attributes: string[]
+  static readonly defaultContract: ClassConstructor
 
-  static readonly deserializeTarget: ClassConstructor<BaseSerializer>
-
-  static serialize(data: unknown) {
+  static serialize(data: unknown, attributes?: string[]) {
     return new Serializer(this.type, {
       id: this.id,
-      attributes: this.attributes,
+      attributes: attributes || this.attributes,
     }).serialize(data)
   }
 
-  static deserialize(data: unknown) {
-    const rawAttributes = new Deserializer().deserialize(data)
-    return this.sanitize(rawAttributes)
+  static deserialize(data: unknown, contract?: ClassConstructor) {
+    let attrs = new Deserializer().deserialize(data)
+
+    attrs = plainToInstance(contract || this.defaultContract, attrs, {
+      excludeExtraneousValues: true,
+    })
+
+    const errors = validateSync(attrs)
+    if (errors.length > 0) throw parseContractErrors(errors)
+
+    return attrs
   }
 
   /* eslint-disable  @typescript-eslint/no-explicit-any */
