@@ -10,6 +10,8 @@ COPY --chown=node:node package*.json ./
 
 USER node
 
+ENV NODE_ENV="development"
+
 RUN npm install
 
 COPY --chown=node:node . .
