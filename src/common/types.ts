@@ -2,3 +2,7 @@
 export declare type ClassConstructor<T = any> = {
   new (...args: any[]): T
 }
+
+export interface unknownObj {
+  [key: string]: any
+}

@@ -8,6 +8,7 @@ export class BaseSerializer {
   static readonly id: string
   static readonly type: string
   static readonly attributes: string[]
+  static readonly entity: ClassConstructor
   static readonly defaultContract: ClassConstructor
 
   static serialize(data: unknown, attributes?: string[]) {
@@ -17,7 +18,11 @@ export class BaseSerializer {
     }).serialize(data)
   }
 
-  static deserialize(data: unknown, contract?: ClassConstructor) {
+  static deserialize<T, K>(
+    data: unknown,
+    contract?: ClassConstructor<T>,
+    entity?: ClassConstructor<K>,
+  ): Partial<K> {
     let attrs = new Deserializer().deserialize(data)
 
     attrs = plainToInstance(contract || this.defaultContract, attrs, {
@@ -27,7 +32,11 @@ export class BaseSerializer {
     const errors = validateSync(attrs)
     if (errors.length > 0) throw parseContractErrors(errors)
 
-    return attrs
+    return this.turnIntoEntity(attrs, entity || this.entity)
+  }
+
+  static turnIntoEntity<T>(attrs: object, entity?: ClassConstructor<T>): T {
+    return plainToInstance(entity || this.entity, attrs) as T
   }
 
   /* eslint-disable  @typescript-eslint/no-explicit-any */

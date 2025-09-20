@@ -1,4 +1,6 @@
-import { IsEmail, IsNotEmpty, IsString, validate } from 'class-validator'
+import { User } from '@prisma/client'
+import { IsEmail, IsNotEmpty, IsString, validateSync } from 'class-validator'
+import { cleanObject, excludeKeys } from '../../common/utils'
 
 export class UserEntity {
   @IsString()
@@ -9,7 +11,17 @@ export class UserEntity {
   @IsNotEmpty()
   email: string
 
-  async validate() {
-    return validate(this)
+  static validate(attrs: Partial<UserEntity>) {
+    validateSync(attrs)
+  }
+
+  static prepareForPersistence(attrs: Partial<UserEntity>): User {
+    this.validate(attrs)
+
+    return {
+      ...excludeKeys(attrs, ['id', 'createdat', 'updatedAt']),
+      ...cleanObject(attrs),
+      updatedAt: new Date(),
+    } as User
   }
 }
